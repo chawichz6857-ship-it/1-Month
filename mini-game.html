@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Game 🎮</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Anuphan', sans-serif;
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffb3c6 25%, #ffc9d9 50%, #ffb3c6 75%, #ffd1dc 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .moments-page {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .page-title {
+            color: #ff1744;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(255, 23, 68, 0.2);
+        }
+
+        .page-subtitle {
+            color: #666;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.18);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .stat {
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff1744 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s;
+        }
+
+        .stat-value.updated {
+            animation: statPulse 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes statPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .memory-game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 0 10px;
+            perspective: 1000px;
+        }
+
+        .memory-card-game {
+            aspect-ratio: 1;
+            background: transparent;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .memory-card-game:hover:not(.flipped):not(.matched) {
+            transform: translateY(-8px) rotateY(10deg);
+        }
+
+        .memory-card-game .front,
+        .memory-card-game .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .memory-card-game .front {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff1744 100%);
+            color: white;
+            font-size: 48px;
+            font-weight: 900;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .memory-card-game .front::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .memory-card-game .back {
+            background: white;
+            transform: rotateY(180deg);
+            font-size: 58px;
+            border: 4px solid #ffc9d9;
+        }
+
+        .memory-card-game .back img {
+            width: 90%;
+            height: 90%;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .memory-card-game.flipped .front {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card-game.flipped .back {
+            transform: rotateY(360deg);
+        }
+
+        .memory-card-game.matched {
+            animation: matchedAnimation 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        @keyframes matchedAnimation {
+            0% {
+                transform: scale(1) rotateY(360deg);
+                opacity: 1;
+            }
+            20% {
+                transform: scale(1.2) rotateY(380deg) rotate(5deg);
+                opacity: 1;
+            }
+            40% {
+                transform: scale(1.3) rotateY(400deg) rotate(-5deg);
+                opacity: 1;
+            }
+            60% {
+                transform: scale(1.1) rotateY(420deg) rotate(0deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(0) rotateY(540deg);
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+
+        .win-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+        }
+
+        .win-overlay.show {
+            display: block;
+        }
+
+        .win-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 45px 35px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.4);
+            z-index: 1000;
+            max-width: 85%;
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .win-message.show {
+            display: block;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.08);
+            }
+            70% {
+                transform: translate(-50%, -50%) scale(0.95);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .win-message h2 {
+            color: #ff1744;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .win-image {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 25px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(255, 23, 68, 0.3);
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff1744 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .win-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Fallback emoji if no image */
+        .win-image:not(:has(img)) {
+            font-size: 100px;
+            color: white;
+        }
+
+        .win-message p {
+            color: #666;
+            font-size: 17px;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .win-message strong {
+            color: #ff1744;
+            font-size: 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            font-family: 'Mitr', sans-serif;
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff1744 100%);
+            color: white;
+        }
+
+        .nav-btn.secondary {
+            background: white;
+            color: #ff1744;
+            border: 3px solid #ff1744;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 23, 68, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 26px;
+            }
+
+            .game-stats {
+                padding: 15px;
+            }
+
+            .stat-value {
+                font-size: 28px;
+            }
+
+            .win-message h2 {
+                font-size: 28px;
+            }
+
+            .win-image {
+                width: 160px;
+                height: 160px;
+            }
+
+            .win-image:not(:has(img)) {
+                font-size: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="moments-page">
+        <div class="page-header">
+            <div class="page-title">Memory For You</div>
+            <div class="page-subtitle">เกมจับคู่ หาสิ่งที่ซ่อนอยู่! 🎮</div>
+        </div>
+        
+        <div class="game-stats">
+            <div class="stat">
+                <div class="stat-label">พลิกไปแล้ว</div>
+                <div class="stat-value" id="flipsCount">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">คู่ที่จับได้</div>
+                <div class="stat-value" id="matchCount">0</div>
+            </div>
+        </div>
+        
+        <div class="memory-game-grid" id="miniGameBoard">
+            <!-- Generated by JavaScript -->
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn primary" onclick="resetMiniGame()">🔄 เริ่มเกมใหม่</button>
+            <button class="nav-btn secondary" onclick="window.location.href='moments.html'">← ย้อนกลับ</button>
+        </div>
+    </div>
+
+    <!-- WIN MESSAGE -->
+    <div class="win-overlay" id="winOverlay"></div>
+    <div class="win-message" id="winMessage">
+        <h2>🎉 อ้วนของเค้าเก่งมากๆเลย!</h2>
+        <div class="win-image">
+            <img src="images/Flower.png" alt="Celebration" onerror="this.parentElement.innerHTML='🎊'">
+        </div>
+        <p>อ้วนจับคู่ภาพความทรงจำได้ครบทุกคู่แล้ว</p>
+        <p>พลิกไป <strong id="finalFlips">0</strong> ครั้ง</p>
+        <button class="nav-btn primary" style="margin-top: 25px; width: 100%;" onclick="closeWinMessage()">เล่นต่อ</button>
+    </div>
+
+    <script>
+        // รูปภาพสำหรับเกม
+        const miniGameImages = [
+            { src: 'images/photo1.jpg' },
+            { src: 'images/photo2.jpg' },
+            { src: 'images/photo3.jpg' },
+            { src: 'images/photo4.jpg' },
+            { src: 'images/photo5.jpg' },
+            { src: 'images/photo6.jpg' }
+        ];
+
+        let miniGameCards = [];
+        let miniGameFlipped = [];
+        let miniGameMatched = 0;
+        let miniGameFlips = 0;
+        let miniGameCanFlip = true;
+
+        function initMiniGame() {
+            miniGameCards = [...miniGameImages, ...miniGameImages].sort(() => Math.random() - 0.5);
+            const board = document.getElementById('miniGameBoard');
+            board.innerHTML = '';
+            
+            miniGameCards.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card-game';
+                card.innerHTML = `
+                    <div class="front">?</div>
+                    <div class="back"><img src="${item.src}" alt="Memory"></div>
+                `;
+                card.onclick = () => flipMiniGameCard(card, item, index);
+                board.appendChild(card);
+            });
+            
+            miniGameFlipped = [];
+            miniGameMatched = 0;
+            miniGameFlips = 0;
+            miniGameCanFlip = true;
+            
+            document.getElementById('flipsCount').textContent = miniGameFlips;
+            document.getElementById('matchCount').textContent = miniGameMatched;
+        }
+
+        function flipMiniGameCard(card, item, index) {
+            if (!miniGameCanFlip || card.classList.contains('flipped') || card.classList.contains('matched')) {
+                return;
+            }
+
+            card.classList.add('flipped');
+            miniGameFlipped.push({ card, item, index });
+
+            if (miniGameFlipped.length === 2) {
+                miniGameFlips++;
+                updateStat('flipsCount', miniGameFlips);
+                miniGameCanFlip = false;
+                setTimeout(checkMiniGameMatch, 700);
+            }
+        }
+
+        function checkMiniGameMatch() {
+            const [first, second] = miniGameFlipped;
+            
+            if (first.item.src === second.item.src && first.index !== second.index) {
+                first.card.classList.add('matched');
+                second.card.classList.add('matched');
+                miniGameMatched++;
+                updateStat('matchCount', miniGameMatched);
+                createHearts(8);
+                
+                if (miniGameMatched === miniGameImages.length) {
+                    setTimeout(showWinMessage, 700);
+                }
+            } else {
+                setTimeout(() => {
+                    first.card.classList.remove('flipped');
+                    second.card.classList.remove('flipped');
+                }, 500);
+            }
+            
+            miniGameFlipped = [];
+            miniGameCanFlip = true;
+        }
+
+        function resetMiniGame() {
+            initMiniGame();
+        }
+
+        function updateStat(id, value) {
+            const element = document.getElementById(id);
+            element.textContent = value;
+            element.classList.add('updated');
+            setTimeout(() => element.classList.remove('updated'), 500);
+        }
+
+        function showWinMessage() {
+            document.getElementById('finalFlips').textContent = miniGameFlips;
+            document.getElementById('winOverlay').classList.add('show');
+            document.getElementById('winMessage').classList.add('show');
+            createHearts(40);
+            createConfetti();
+        }
+
+        function closeWinMessage() {
+            document.getElementById('winOverlay').classList.remove('show');
+            document.getElementById('winMessage').classList.remove('show');
+            resetMiniGame();
+        }
+
+        function createHearts(count = 15) {
+            const hearts = ['💕', '💖', '💗', '💘', '💝', '💓'];
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.style.position = 'fixed';
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.top = '100vh';
+                    heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                    heart.style.animation = 'heartFloat 4s ease-in-out';
+                    heart.style.zIndex = '9999';
+                    heart.style.pointerEvents = 'none';
+                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 4000);
+                }, i * 80);
+            }
+        }
+
+        function createConfetti() {
+            const colors = ['#ff6b9d', '#ff1744', '#ffc9d9', '#ffb3c6'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'fixed';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = '-10px';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animation = 'particleFall 2s ease-out forwards';
+                    confetti.style.zIndex = '9999';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 30);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            initMiniGame();
+        });
+    </script>
+
+    <style>
+        @keyframes heartFloat {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-120vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes particleFall {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg) scale(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Letter 💌</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Anuphan', sans-serif;
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffb3c6 25%, #ffc9d9 50%, #ffb3c6 75%, #ffd1dc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            perspective: 1500px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .envelope-wrapper {
+            width: 350px;
+            height: 220px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope-wrapper:hover:not(.opening) {
+            transform: scale(1.05);
+        }
+
+        /* ซองจดหมาย - ส่วนล่าง */
+        .envelope {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .envelope-body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8fb3 100%);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .envelope-body::before {
+            content: '💕';
+            font-size: 70px;
+            opacity: 0.3;
+        }
+
+        /* ฝาซอง */
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 175px solid transparent;
+            border-right: 175px solid transparent;
+            border-top: 110px solid #ff4d7d;
+            transform-origin: top center;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 20;
+        }
+
+        .envelope-wrapper.opening .envelope-flap {
+            transform: rotateX(-180deg);
+            pointer-events: none;
+        }
+
+        /* กระดาษจดหมาย */
+        .letter {
+            position: absolute;
+            width: 310px;
+            min-height: 420px;
+            background: white;
+            top: 180px;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            border-radius: 10px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            transition: all 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 15;
+            padding: 35px 30px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .envelope-wrapper.opening .letter {
+            transform: translateX(-50%) translateY(-320px);
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 30; /* ให้สูงกว่าฝาซอง */
+        }
+
+        /* เนื้อหาจดหมาย */
+        .letter-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #ffb3c6;
+        }
+
+        .letter-title {
+            color: #ff1744;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-family: 'Mitr', sans-serif;
+        }
+
+        .letter-date {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .letter-content {
+            color: #333;
+            font-size: 15px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .letter-content::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .letter-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .letter-content::-webkit-scrollbar-thumb {
+            background: #ffb3c6;
+            border-radius: 10px;
+        }
+
+        .letter-signature {
+            margin-top: 25px;
+            text-align: right;
+            color: #ff1744;
+            font-weight: 600;
+            font-style: italic;
+            font-size: 16px;
+        }
+
+        /* ปุ่มควบคุม */
+        .nav-buttons {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards 1s;
+        }
+
+        .nav-btn {
+            padding: 15px 35px;
+            background: white;
+            color: #ff1744;
+            border: 3px solid #ff1744;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Mitr', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 23, 68, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #ff1744;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 23, 68, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* คำแนะนำ */
+        .instruction {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff1744;
+            font-size: 18px;
+            font-weight: 600;
+            background: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            animation: bounce 2s ease infinite;
+            z-index: 999;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        .envelope-wrapper.opening ~ .instruction {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        /* หัวใจลอย */
+        @keyframes heartFloat {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(-20px) rotate(45deg) scale(1);
+            }
+            100% {
+                transform: translateY(-100vh) rotate(180deg) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        .heart-particle {
+            position: fixed;
+            font-size: 35px;
+            pointer-events: none;
+            z-index: 9999;
+            animation: heartFloat 3s ease-out forwards;
+        }
+
+        @media (max-width: 768px) {
+            .envelope-wrapper {
+                width: 300px;
+                height: 190px;
+            }
+
+            .envelope-flap {
+                border-left: 150px solid transparent;
+                border-right: 150px solid transparent;
+                border-top: 95px solid #ff4d7d;
+                z-index: 10;
+
+            }
+
+            .letter {
+                width: 270px;
+                padding: 30px 25px;
+            }
+
+            .letter-title {
+                font-size: 22px;
+            }
+
+            .letter-content {
+                font-size: 14px;
+            }
+
+            .nav-buttons {
+                bottom: 20px;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav-btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+
+            .instruction {
+                font-size: 15px;
+                padding: 12px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="instruction">👆 คลิกที่ซองจดหมาย</div>
+
+    <div class="container">
+        <div class="envelope-wrapper" id="envelopeWrapper">
+            <div class="letter" id="letter">
+                <div class="letter-header">
+                    <div class="letter-title">สุขสันวันครบรอบน้า</div>
+                    <div class="letter-date">09 มกราคม 2569</div>
+                </div>
+                <div class="letter-content">ถึงอ้วนคนรักคนเดียวในดวงใจเค้า,
+
+เค้ารักอ้วนมากๆๆๆๆๆๆๆๆกอไก่แบบไม่สิ้นสุด เค้ารู้สึกดีใจมากๆเลยที่ได้อยู่กับอ้วนมาจนถึงทุกวันนี้ เค้ามีความสุขมากๆที่ได้อ้วนเป็นแฟนถึงจะทะเลาะกันหนักและบ่อยมากแค่ไหน เค้าก็รักอ้วนมากๆๆเลยน้า เค้าอยากอยู่กับอ้วนไปนานนนแสนนานไม่หายกันไปไหนอยู่ด้วยกันจนเค้ากับอ้วนเรือนร่างสลายหายไปพร้อมๆกันเค้าก็ยังคงรักอ้วนอยู่เสมอถึงร่างกายจะสลายหายไปพร้อมอ้วน เค้ารักอ้วนมากๆๆเยย เค้ารักอ้วนเสมอน้าา เค้าไม่เคยอยากเสียอ้วนไปเลยจริงๆ ขอบคุณที่เข้ามาเป็นความสุขความน่ารักความสดใสทุกอย่างให้เค้าน้า เค้ารักอ้วนมากๆเยยน้ารักๆๆๆ จุ้บๆ สุขสันวันครบรอบ 1 เดือนน้าอ้วน ขอให้เรารักกันแบบนี้ไปนานๆเลยน้าไอแมวดุของเค้า💗💗
+
+รักอ้วนที่สุด</div>
+                <div class="letter-signature">ด้วยรัก 💕<br>จากใจคนที่รักอ้วน</div>
+            </div>
+
+            <div class="envelope">
+                <div class="envelope-flap"></div>
+                <div class="envelope-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+    <a href="moments.html">
+        <button class="nav-btn">← ย้อนกลับ</button>
+    </a>
+
+    <a href="netflix-page.html">
+        <button class="nav-btn">ถัดไป →</button>
+    </a>
+</div>
+
+    <script>
+        const wrapper = document.getElementById('envelopeWrapper');
+        let isOpen = false;
+
+        wrapper.addEventListener('click', function() {
+            if (!isOpen) {
+                wrapper.classList.add('opening');
+                isOpen = true;
+                createHearts();
+            }
+        });
+
+        function createHearts() {
+            const hearts = ['💕', '💖', '💗', '💘', '💓', '💞', '❤️', '💝'];
+            for (let i = 0; i < 25; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart-particle';
+                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                    heart.style.left = (Math.random() * 100) + '%';
+                    heart.style.top = '60%';
+                    heart.style.animationDelay = (Math.random() * 0.5) + 's';
+                    document.body.appendChild(heart);
+                    
+                    setTimeout(() => {
+                        heart.remove();
+                    }, 3000);
+                }, i * 80);
+            }
+        }
+
+        function goBack() {
+            // แก้ไข URL สำหรับย้อนกลับ
+            window.location.href = 'previous-page.html';
+        }
+
+        function goNext() {
+            // แก้ไข URL สำหรับหน้าถัดไป
+            window.location.href = 'next-page.html';
+        }
+    </script>
+</body>
+</html>

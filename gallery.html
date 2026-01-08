@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Love Year 💕</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Anuphan', sans-serif;
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffb3c6 25%, #ffc9d9 50%, #ffb3c6 75%, #ffd1dc 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+                        position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .title {
+            color: #ff1744;
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(255, 23, 68, 0.2);
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .day-card {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: cardAppear 0.5s ease-out backwards;
+        }
+
+        .day-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(255, 23, 68, 0.3);
+        }
+
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .day-icon {
+            width: 100%;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .day-icon video,
+        .day-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .day-icon .emoji {
+            position: relative;
+            z-index: 1;
+        }
+
+        .day-label {
+            text-align: center;
+            color: #ff1744;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 2% auto;
+            width: 90%;
+            max-width: 500px;
+            animation: modalSlideIn 0.4s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+
+        .modal-title {
+            color: #ff1744;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .modal-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .modal-video-container {
+            background: white;
+            padding: 15px;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            aspect-ratio: 9/16;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-wrapper video,
+        .video-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-placeholder {
+            text-align: center;
+            color: white;
+            padding: 20px;
+        }
+
+        .video-placeholder .emoji {
+            font-size: 80px;
+            margin-bottom: 10px;
+        }
+
+        .video-placeholder p {
+            font-size: 16px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 23, 68, 0.8);
+            border-radius: 50%;
+        }
+
+        .close-btn:hover {
+            background: #ff1744;
+            transform: rotate(90deg);
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 32px;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 15px;
+            }
+
+            .day-icon {
+                font-size: 40px;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">Our Love Year 💕</div>
+            <div class="subtitle">ความทรงจำในแต่ละวัน</div>
+        </div>
+
+        <div class="gallery-grid" id="galleryGrid"></div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button onclick="window.location.href='Moments.html'" style="
+                background: white;
+                color: #ff1744;
+                border: 3px solid #ff1744;
+                padding: 15px 40px;
+                border-radius: 18px;
+                font-size: 18px;
+                font-weight: 700;
+                cursor: pointer;
+                font-family: 'Mitr', sans-serif;
+                box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+                transition: all 0.3s;
+            " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 10px 30px rgba(255, 23, 68, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'">
+                ← กลับหน้าหลัก
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Day 1</div>
+                <div class="modal-subtitle" id="modalSubtitle">วันที่ 1</div>
+            </div>
+            <div class="modal-video-container">
+                <div class="video-wrapper" id="videoWrapper"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูล 30 วัน พร้อม emoji และข้อมูลวิดีโอ/รูปภาพ
+        const daysData = [
+            {
+    day: 1,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767894387/day1_ljxxcs.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767894387/day1_ljxxcs.mp4',
+    nameTH: 'วันที่ 1'
+  },
+  
+  {
+    day: 2,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767900265/day2_rbtogn.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767900265/day2_rbtogn.mp4',
+    nameTH: 'วันที่ 2'
+  },
+
+  {
+    day: 3,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893827/day3_nrkbv1.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893827/day3_nrkbv1.mp4',
+    nameTH: 'วันที่ 3'
+  },
+
+  {
+    day: 4,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893831/day4_bteqkb.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893831/day4_bteqkb.mp4',
+    nameTH: 'วันที่ 4'
+  },
+
+  {
+    day: 5,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893832/day5_x4ds8e.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893832/day5_x4ds8e.mp4',
+    nameTH: 'วันที่ 5'
+  },
+  {
+    day: 6,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767895801/day6_o7whzd.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767895801/day6_o7whzd.mp4',
+    nameTH: 'วันที่ 6'
+  },
+  {
+    day: 7,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893858/day7_sw02em.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893858/day7_sw02em.mp4',
+    nameTH: 'วันที่ 7'
+  },
+  {
+    day: 8,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893834/day8_a92f2b.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893834/day8_a92f2b.mp4',
+    nameTH: 'วันที่ 8'
+  },
+  {
+    day: 9,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767894140/day9_pgnr2a.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767894140/day9_pgnr2a.mp4',
+    nameTH: 'วันที่ 9'
+  },
+  {
+    day: 10,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893843/day10_srwtnt.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893843/day10_srwtnt.mp4',
+    nameTH: 'วันที่ 10'
+  },
+  {
+    day: 11,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767894142/day11_hwbp3b.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767894142/day11_hwbp3b.mp4',
+    nameTH: 'วันที่ 11'
+  },
+  {
+    day: 12,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893845/day12_oyyife.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893845/day12_oyyife.mp4',
+    nameTH: 'วันที่ 12'
+  },
+  {
+    day: 13,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767894098/day13_wwccm6.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767894098/day13_wwccm6.mp4',
+    nameTH: 'วันที่ 13'
+  },
+  {
+    day: 14,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893851/day14_lqkpug.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893851/day14_lqkpug.mp4',
+    nameTH: 'วันที่ 14'
+  },
+  {
+    day: 15,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893868/day15_xz6mmo.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893868/day15_xz6mmo.mp4',
+    nameTH: 'วันที่ 15'
+  },
+  {
+    day: 16,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893862/day16_g3znq2.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893862/day16_g3znq2.mp4',
+    nameTH: 'วันที่ 16'
+  },
+  {
+    day: 17,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893841/day17_b10dgy.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893841/day17_b10dgy.mp4',
+    nameTH: 'วันที่ 17'
+  },
+  {
+    day: 18,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893830/day18_riagqt.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893830/day18_riagqt.mp4',
+    nameTH: 'วันที่ 18'
+  },
+  {
+    day: 19,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893831/day19_jo4ugf.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893831/day19_jo4ugf.mp4',
+    nameTH: 'วันที่ 19'
+  },
+  {
+    day: 20,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893831/day20_ulmqnf.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893831/day20_ulmqnf.mp4',
+    nameTH: 'วันที่ 20'
+  },
+  {
+    day: 21,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893838/day21_af5c3k.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893838/day21_af5c3k.mp4',
+    nameTH: 'วันที่ 21'
+  },
+  {
+    day: 22,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767895833/day22_zphloj.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767895833/day22_zphloj.mp4',
+    nameTH: 'วันที่ 22'
+  },
+  {
+    day: 23,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893837/day23_h4kdm5.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893837/day23_h4kdm5.mp4',
+    nameTH: 'วันที่ 23'
+  },
+  {
+    day: 24,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893842/day24_xmjhth.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893842/day24_xmjhth.mp4',
+    nameTH: 'วันที่ 24'
+  },
+  {
+    day: 25,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893867/day25_qdvhmz.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893867/day25_qdvhmz.mp4',
+    nameTH: 'วันที่ 25'
+  },
+  {
+    day: 26,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893858/day26_abjs7q.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893858/day26_abjs7q.mp4',
+    nameTH: 'วันที่ 26'
+  },
+  {
+    day: 27,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893858/day27_atxxws.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893858/day27_atxxws.mp4',
+    nameTH: 'วันที่ 27'
+  },
+  {
+    day: 28,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893859/day28_wkl06k.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893859/day28_wkl06k.mp4',
+    nameTH: 'วันที่ 28'
+  },
+  {
+    day: 29,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893862/day29_derjru.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893862/day29_derjru.mp4',
+    nameTH: 'วันที่ 29'
+  },
+  {
+    day: 30,
+    emoji: '💝',
+    video: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893863/day30_aodc0e.mp4',
+    thumbnail: 'https://res.cloudinary.com/dqteswo70/video/upload/v1767893863/day30_aodc0e.mp4',
+    nameTH: 'วันที่ 30'
+  },
+        ];
+        
+        // สร้างการ์ดสำหรับแต่ละวัน
+        function createGallery() {
+            const grid = document.getElementById('galleryGrid');
+            
+            daysData.forEach((day, index) => {
+                const card = document.createElement('div');
+                card.className = 'day-card';
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.onclick = () => openModal(day);
+                
+                let iconContent = '';
+                
+                // ถ้ามี thumbnail (วิดีโอหรือรูป) ให้แสดงเป็นปก
+                if (day.thumbnail) {
+                    if (day.thumbnail.endsWith('.mp4') || day.thumbnail.endsWith('.webm')) {
+                        // ถ้าเป็นไฟล์วิดีโอ
+                        iconContent = `
+                            <video muted loop autoplay playsinline>
+                                <source src="${day.thumbnail}" type="video/mp4">
+                            </video>
+                            <div class="emoji">${day.emoji}</div>
+                        `;
+                    } else {
+                        // ถ้าเป็นรูปภาพ
+                        iconContent = `
+                            <img src="${day.thumbnail}" alt="Day ${day.day}">
+                            <div class="emoji">${day.emoji}</div>
+                        `;
+                    }
+                } else {
+                    // ถ้าไม่มี thumbnail ให้แสดง emoji อย่างเดียว
+                    iconContent = day.emoji;
+                }
+                
+                card.innerHTML = `
+                    <div class="day-icon">${iconContent}</div>
+                    <div class="day-label">Day ${day.day}</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // เปิด Modal
+        function openModal(dayData) {
+            const modal = document.getElementById('videoModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalSubtitle = document.getElementById('modalSubtitle');
+            const wrapper = document.getElementById('videoWrapper');
+            
+            modalTitle.textContent = `Day ${dayData.day}`;
+            modalSubtitle.textContent = dayData.nameTH;
+            
+            if (dayData.video) {
+                // ถ้ามีวิดีโอ
+                wrapper.innerHTML = `
+    <video controls autoplay muted playsinline>
+        <source src="${dayData.video}" type="video/mp4">
+        เบราว์เซอร์ของคุณไม่รองรับวิดีโอ
+    </video>
+`;
+            } else if (dayData.img) {
+                // ถ้ามีรูปภาพ
+                wrapper.innerHTML = `<img src="${dayData.img}" alt="Day ${dayData.day}">`;
+            } else {
+                // ถ้าไม่มีทั้งสองอย่าง แสดง placeholder
+                wrapper.innerHTML = `
+                    <div class="video-placeholder">
+                        <div class="emoji">${dayData.emoji}</div>
+                        <p>ใส่วิดีโอหรือรูปภาพของ ${dayData.nameTH}</p>
+                    </div>
+                `;
+            }
+            
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // ปิด Modal
+        function closeModal() {
+            const modal = document.getElementById('videoModal');
+            const wrapper = document.getElementById('videoWrapper');
+            
+            // หยุดวิดีโอก่อนปิด
+            const video = wrapper.querySelector('video');
+            if (video) {
+                video.pause();
+            }
+            
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // ปิด Modal เมื่อคลิกนอก content
+        window.onclick = function(event) {
+            const modal = document.getElementById('videoModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // ปิด Modal ด้วย ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // สร้าง Gallery เมื่อโหลดหน้าเว็บ
+        window.addEventListener('load', createGallery);
+    </script>
+</body>
+</html>
